@@ -4,7 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import ProductCard from '../components/ProductCard';
 import { ShoppingBag, Mail, Quote, Send } from 'lucide-react';
 
-// IMPORTATION DE LA FONCTION SEED (Vérifie bien le nom du fichier)
+// IMPORTATION DE LA FONCTION SEED
 import { uploadAllProducts } from '../seed-fix'; 
 
 const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Collection' } }) => {
@@ -13,8 +13,8 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
 
   // 1. ATTACHEMENT DE LA FONCTION SEED À LA CONSOLE
   useEffect(() => {
-    window.uploadJR = uploadAllProducts;
-    console.log("🚀 JR Store : Tapez uploadJR() dans la console pour remplir le catalogue.");
+    window.uploadGoat = uploadAllProducts;
+    console.log("🚀 GOATSTORE : Tapez uploadGoat() dans la console pour remplir le catalogue.");
   }, []);
 
   // 2. RÉCUPÉRATION DES PRODUITS
@@ -82,10 +82,10 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
       <section className="py-24 bg-slate-50 border-y border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Quote className="mx-auto text-orange-600 mb-8 opacity-20" size={48} />
-          <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-6">Manifeste de l'Excellence</h3>
+          <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-6">Manifeste GOATSTORE</h3>
           <p className="text-lg text-slate-600 leading-relaxed font-medium italic">
-            "Plus qu'une boutique, un style de vie. Nous sélectionnons le meilleur du digital et de la mode 
-            pour ceux qui n'acceptent que l'excellence."
+            "Plus qu'une boutique, un standard de vie. Nous sélectionnons uniquement le meilleur du digital et de la mode 
+            pour ceux qui visent le sommet. Soyez le GOAT."
           </p>
         </div>
       </section>
@@ -95,8 +95,9 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
         <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 blur-[120px] rounded-full"></div>
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <Mail className="mx-auto text-orange-500 mb-8" size={40} />
-          <h4 className="text-4xl font-black uppercase tracking-tighter mb-6">Rejoins le Club JR</h4>
-          <form className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+          <h4 className="text-4xl font-black uppercase tracking-tighter mb-6">Rejoignez le Club GOAT</h4>
+          <p className="mb-8 text-slate-400 text-sm uppercase tracking-[0.3em]">Accès prioritaire aux nouveautés</p>
+          <form className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto" onSubmit={(e) => e.preventDefault()}>
             <input 
               type="email" 
               placeholder="Ton email premium" 

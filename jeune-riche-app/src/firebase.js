@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// 1. On ajoute l'import pour Firestore
 import { getFirestore } from "firebase/firestore";
+// 1. On importe getAuth pour gérer les connexions clients
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCuNvNcUT4oDCwTk9UsMq2eRFC6rpL7mig",
@@ -13,9 +14,12 @@ const firebaseConfig = {
   measurementId: "G-EX6FY1PTC1"
 };
 
-// 2. Initialisation
+// 2. Initialisation de l'application Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// 3. ON EXPORTE LA VARIABLE DB (C'est ce qui manque !)
+// 3. ON EXPORTE LES SERVICES
+// La base de données Firestore
 export const db = getFirestore(app);
+// Le service d'authentification (C'est ce qui corrige ton erreur !)
+export const auth = getAuth(app);
