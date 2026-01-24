@@ -3,13 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useCart } from '../context/CartContext';
-import { ChevronLeft, ShieldCheck, Truck, Download, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ShieldCheck, Truck, Download, LayoutGrid, MessageCircle } from 'lucide-react';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const { addToCart } = useCart();
+
+  // Fonction pour commander directement via WhatsApp
+  const handleWhatsAppOrder = () => {
+    const phoneNumber = "225 07 67 79 31 20"; // 👈 REMPLACE PAR TON NUMÉRO ICI
+    const message = `Salut GOATSTORE ! 👋\nJe suis intéressé par cet article :\n\n*Produit:* ${product.name}\n*Prix:* ${Number(product.price).toLocaleString()} FCFA\n\nEst-ce qu'il est toujours disponible ?`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+  };
 
   useEffect(() => {
     const getProduct = async () => {
@@ -44,7 +52,6 @@ const ProductDetails = () => {
             className="w-full h-full object-cover opacity-50" 
             alt={product.name}
           />
-          {/* Dégradé pour le fondu vers le bas */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white"></div>
         </div>
 
@@ -79,17 +86,6 @@ const ProductDetails = () => {
               <p className="text-slate-600 leading-relaxed text-lg">
                 {product.description || "Une pièce d'exception sélectionnée pour son style unique et sa qualité supérieure. Disponible uniquement sur GOATSTORE Abidjan."}
               </p>
-
-              {product.type === 'digital' && product.specs && (
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {Object.entries(product.specs).map(([key, val]) => (
-                    <div key={key} className="bg-white p-4 rounded-xl border border-slate-200">
-                      <span className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{key}</span>
-                      <span className="text-sm font-black text-slate-900">{val}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -110,31 +106,36 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Colonne Droite : Panier Fixe */}
+          {/* Colonne Droite : Achat & WhatsApp */}
           <div className="lg:col-span-5 lg:sticky lg:top-32">
-            <div className="bg-white p-8 rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100">
-              <div className="flex justify-between items-center mb-8">
+            <div className="bg-white p-8 rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 space-y-4">
+              <div className="flex justify-between items-center mb-4">
                 <div>
                   <span className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em]">Prix GOATSTORE</span>
                   <div className="text-4xl font-black text-slate-900 mt-1">
                     {Number(product.price).toLocaleString()} <span className="text-sm font-medium">FCFA</span>
                   </div>
                 </div>
-                {product.type === 'digital' && (
-                  <div className="bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 uppercase">
-                    <Download size={12} /> G.S Tech
-                  </div>
-                )}
               </div>
 
+              {/* Bouton Panier Classique */}
               <button 
                 onClick={() => addToCart(product)}
-                className="w-full bg-slate-900 text-white py-6 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-orange-600 hover:shadow-2xl hover:shadow-orange-200 transition-all duration-300 active:scale-95"
+                className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-slate-800 transition-all active:scale-95"
               >
-                Prendre cet article
+                Ajouter au panier
               </button>
 
-              <p className="text-center text-[10px] text-slate-400 mt-6 uppercase font-bold tracking-widest">
+              {/* Bouton WhatsApp - Direct Checkout */}
+              <button 
+                onClick={handleWhatsAppOrder}
+                className="w-full bg-[#25D366] text-white py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-[#1fb355] transition-all shadow-xl shadow-green-100 active:scale-95"
+              >
+                <MessageCircle size={18} fill="white" />
+                Commander via WhatsApp
+              </button>
+
+              <p className="text-center text-[10px] text-slate-400 mt-6 uppercase font-bold tracking-widest pt-4">
                 Service Premium GOATSTORE • Abidjan
               </p>
             </div>
