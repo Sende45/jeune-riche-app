@@ -11,7 +11,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingId, setEditingId] = useState(null); // AJOUT : Pour savoir si on modifie un produit
+  const [editingId, setEditingId] = useState(null); 
   const [imageFile, setImageFile] = useState(null); 
   const [previewUrl, setPreviewUrl] = useState(null); 
   
@@ -21,7 +21,8 @@ const Admin = () => {
     category: '', 
     image: '',
     description: '',
-    type: 'physique'
+    type: 'physique',
+    stock: 10 // MODIF : Ajout du stock par défaut
   });
 
   const adminEmail = "yohannesende@gmail.com"; 
@@ -66,7 +67,6 @@ const Admin = () => {
     }
   };
 
-  // AJOUT : Fonction pour remplir le formulaire avec les infos du produit à modifier
   const handleEditClick = (product) => {
     setEditingId(product.id);
     setNewProduct({
@@ -75,7 +75,8 @@ const Admin = () => {
       category: product.category,
       image: product.image,
       description: product.description || '',
-      type: product.type || 'physique'
+      type: product.type || 'physique',
+      stock: product.stock || 0 // MODIF : Récupération du stock existant
     });
     setPreviewUrl(product.image);
     setShowAddForm(true);
@@ -102,28 +103,29 @@ const Admin = () => {
         }
       }
 
-      // MODIFICATION : Si editingId existe, on fait un updateDoc, sinon un addDoc
       if (editingId) {
         const productRef = doc(db, "products", editingId);
         await updateDoc(productRef, {
           ...newProduct,
           image: finalImageUrl,
-          price: Number(newProduct.price)
+          price: Number(newProduct.price),
+          stock: Number(newProduct.stock) // MODIF : Sauvegarde du stock
         });
       } else {
         await addDoc(collection(db, "products"), {
           ...newProduct,
           image: finalImageUrl,
           price: Number(newProduct.price),
+          stock: Number(newProduct.stock), // MODIF : Sauvegarde du stock
           createdAt: new Date()
         });
       }
 
       setShowAddForm(false);
-      setEditingId(null); // Reset après succès
+      setEditingId(null);
       setImageFile(null);
       setPreviewUrl(null);
-      setNewProduct({ name: '', price: '', category: '', image: '', description: '', type: 'physique' });
+      setNewProduct({ name: '', price: '', category: '', image: '', description: '', type: 'physique', stock: 10 });
       fetchData();
     } catch (error) {
       alert("Erreur : " + error.message);
@@ -157,7 +159,6 @@ const Admin = () => {
 
   return (
     <div className="pt-28 px-6 max-w-7xl mx-auto pb-20">
-      {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
         <div>
           <h1 className="text-5xl font-black uppercase tracking-tighter italic">Panel <span className="text-orange-600">G.S</span></h1>
@@ -179,7 +180,6 @@ const Admin = () => {
         </div>
       </div>
 
-      {/* RECHERCHE */}
       {view === 'products' && (
         <div className="mb-8 relative max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -195,7 +195,6 @@ const Admin = () => {
 
       {loading && <RefreshCw className="animate-spin mx-auto text-orange-600 mb-10" />}
 
-      {/* VUE PRODUITS */}
       {view === 'products' && (
         <>
           {showAddForm && (
@@ -212,31 +211,34 @@ const Admin = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <input required value={newProduct.price} type="number" placeholder="Prix FCFA" className="w-full p-4 bg-slate-100 rounded-xl font-bold outline-none border-2 border-transparent focus:border-orange-500 transition-all" onChange={e => setNewProduct({...newProduct, price: e.target.value})} />
                     
-                    <select 
-                      required
-                      value={newProduct.category}
-                      className="w-full p-4 bg-slate-100 rounded-xl font-bold outline-none border-2 border-transparent focus:border-orange-500 transition-all appearance-none" 
-                      onChange={e => setNewProduct({...newProduct, category: e.target.value})}
-                    >
-                      <option value="">📁 Catégorie</option>
-                      <optgroup label="⚡ DIGITAL">
-                        <option value="Téléphones">Téléphones</option>
-                        <option value="Ordinateurs">Ordinateurs</option>
-                        <option value="Consoles">Consoles</option>
-                        <option value="Accessoires">Accessoires</option>
-                      </optgroup>
-                      <optgroup label="👕 VÊTEMENTS">
-                        <option value="Homme">Homme</option>
-                        <option value="Femme">Femme</option>
-                        <option value="Enfant">Enfant</option>
-                      </optgroup>
-                      <optgroup label="👟 CHAUSSURES">
-                        <option value="Baskets">Baskets</option>
-                        <option value="Luxe">Luxe</option>
-                        <option value="Sport">Sport</option>
-                      </optgroup>
-                    </select>
+                    {/* MODIF : Ajout du champ Stock ici */}
+                    <input required value={newProduct.stock} type="number" placeholder="Stock" className="w-full p-4 bg-slate-100 rounded-xl font-bold outline-none border-2 border-transparent focus:border-orange-500 transition-all" onChange={e => setNewProduct({...newProduct, stock: e.target.value})} />
                   </div>
+
+                  <select 
+                    required
+                    value={newProduct.category}
+                    className="w-full p-4 bg-slate-100 rounded-xl font-bold outline-none border-2 border-transparent focus:border-orange-500 transition-all appearance-none" 
+                    onChange={e => setNewProduct({...newProduct, category: e.target.value})}
+                  >
+                    <option value="">📁 Catégorie</option>
+                    <optgroup label="⚡ DIGITAL">
+                      <option value="Téléphones">Téléphones</option>
+                      <option value="Ordinateurs">Ordinateurs</option>
+                      <option value="Consoles">Consoles</option>
+                      <option value="Accessoires">Accessoires</option>
+                    </optgroup>
+                    <optgroup label="👕 VÊTEMENTS">
+                      <option value="Homme">Homme</option>
+                      <option value="Femme">Femme</option>
+                      <option value="Enfant">Enfant</option>
+                    </optgroup>
+                    <optgroup label="👟 CHAUSSURES">
+                      <option value="Baskets">Baskets</option>
+                      <option value="Luxe">Luxe</option>
+                      <option value="Sport">Sport</option>
+                    </optgroup>
+                  </select>
 
                   <div className="flex flex-col gap-2">
                     {previewUrl && (
@@ -272,13 +274,18 @@ const Admin = () => {
             {filteredProducts.map(product => (
               <div key={product.id} className="bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden group">
                 <img src={product.image} alt="" className="w-full h-48 object-cover rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-500" />
+                
+                {/* MODIF : Affichage rapide du stock sur la carte Admin */}
+                <div className={`absolute top-16 right-6 px-2 py-1 rounded text-[8px] font-black uppercase ${product.stock <= 5 ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+                  Stock: {product.stock || 0}
+                </div>
+
                 <div className="flex justify-between items-start px-2">
                   <div className="flex-1 mr-2">
                     <h4 className="font-black uppercase italic text-sm tracking-tighter truncate">{product.name}</h4>
                     <p className="text-orange-600 font-black text-sm">{product.price?.toLocaleString()} FCFA</p>
                   </div>
                   <div className="flex gap-2">
-                    {/* BOUTON MODIFIER AJOUTÉ ICI */}
                     <button onClick={() => handleEditClick(product)} className="p-2 text-slate-400 hover:text-blue-500 transition-colors bg-slate-50 rounded-xl">
                       <Edit2 size={16} />
                     </button>
@@ -296,7 +303,6 @@ const Admin = () => {
         </>
       )}
 
-      {/* VUE COMMANDES */}
       {view === 'orders' && (
         <div className="grid gap-4">
           {orders.map(order => (

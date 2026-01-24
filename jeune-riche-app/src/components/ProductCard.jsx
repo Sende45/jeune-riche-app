@@ -1,9 +1,9 @@
 import React from 'react';
-import { ShoppingCart, Download, ArrowRight, Plus } from 'lucide-react';
+import { ShoppingCart, Download, ArrowRight, Plus, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 
-const ProductCard = ({ id, name, price, category, image, type, subCategory }) => {
+const ProductCard = ({ id, name, price, category, image, type, subCategory, stock }) => {
   const { addToCart } = useCart();
 
   // Fonction pour gérer les liens d'images morts
@@ -21,7 +21,7 @@ const ProductCard = ({ id, name, price, category, image, type, subCategory }) =>
             alt={name}
             onError={handleImageError} // Sécurité ici
             loading="lazy" // Performance ici
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 ${stock === 0 ? 'grayscale opacity-60' : ''}`}
           />
         </Link>
         
@@ -35,6 +35,13 @@ const ProductCard = ({ id, name, price, category, image, type, subCategory }) =>
               <Download className="w-3 h-3" /> DIGITAL
             </span>
           )}
+          
+          {/* NOUVEAU : Badge Rupture de Stock */}
+          {stock === 0 && (
+            <span className="bg-slate-900 text-white px-3 py-1 rounded-full text-[9px] font-black flex items-center gap-1 shadow-lg">
+              SOLD OUT
+            </span>
+          )}
         </div>
 
         {/* Overlay au survol */}
@@ -42,19 +49,37 @@ const ProductCard = ({ id, name, price, category, image, type, subCategory }) =>
         
         <div className="absolute bottom-4 left-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-75">
           <button 
+            disabled={stock === 0}
             onClick={(e) => {
               e.preventDefault();
-              addToCart({ id, name, price, image, category, type });
+              if (stock > 0) {
+                addToCart({ id, name, price, image, category, type });
+              }
             }}
-            className="w-full bg-white/95 backdrop-blur-md text-slate-900 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 shadow-2xl hover:bg-orange-600 hover:text-white transition-all active:scale-95"
+            className={`w-full py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 shadow-2xl transition-all active:scale-95 ${
+              stock === 0 
+              ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+              : 'bg-white/95 backdrop-blur-md text-slate-900 hover:bg-orange-600 hover:text-white'
+            }`}
           >
-            <Plus size={14} /> Ajouter au panier
+            {stock === 0 ? 'Indisponible' : <><Plus size={14} /> Ajouter au panier</>}
           </button>
         </div>
       </div>
 
       {/* Détails du Produit */}
       <div className="space-y-2 px-1 text-center">
+        
+        {/* NOUVEAU : Alerte Stock Bas */}
+        <div className="h-4 flex items-center justify-center mb-1">
+          {stock <= 5 && stock > 0 && (
+            <div className="flex items-center gap-1 animate-pulse">
+              <span className="w-1 h-1 bg-red-600 rounded-full"></span>
+              <p className="text-[9px] font-black text-red-600 uppercase">Plus que {stock} articles !</p>
+            </div>
+          )}
+        </div>
+
         <Link to={`/product/${id}`}>
           <h3 className="text-slate-900 font-black uppercase text-sm tracking-tighter leading-tight group-hover:text-orange-600 transition-colors line-clamp-2">
             {name}
