@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+// Ajout de Eye et EyeOff pour l'icône de visibilité
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false); // État pour la visibilité
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
   const [error, setError] = useState("");
 
@@ -17,14 +19,13 @@ const Auth = () => {
         await signInWithEmailAndPassword(auth, formData.email, formData.password);
       } else {
         const res = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        // Sauvegarde du profil dans Firestore
         await setDoc(doc(db, "users", res.user.uid), {
           name: formData.name,
           email: formData.email,
           createdAt: new Date()
         });
       }
-      window.location.href = "/"; // Redirection après succès
+      window.location.href = "/";
     } catch (err) {
       setError("Erreur : Vérifiez vos identifiants");
     }
@@ -53,6 +54,7 @@ const Auth = () => {
               />
             </div>
           )}
+          
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
@@ -61,13 +63,25 @@ const Auth = () => {
               onChange={(e) => setFormData({...formData, email: e.target.value})}
             />
           </div>
+
+          {/* Champ Mot de passe modifié */}
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
-              type="password" placeholder="Mot de passe" required
+              type={showPassword ? "text" : "password"} // Type dynamique
+              placeholder="Mot de passe" 
+              required
               className="w-full bg-slate-50 border-none px-12 py-4 rounded-2xl focus:ring-2 focus:ring-orange-500 transition-all"
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
+            {/* Bouton pour afficher/masquer */}
+            <button
+              type="button" // Important pour ne pas soumettre le formulaire
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-orange-500 transition-colors"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
 
           {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
@@ -78,7 +92,10 @@ const Auth = () => {
         </form>
 
         <button 
-          onClick={() => setIsLogin(!isLogin)}
+          onClick={() => {
+            setIsLogin(!isLogin);
+            setShowPassword(false); // Reset la visibilité quand on change de mode
+          }}
           className="w-full mt-6 text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-black transition-colors"
         >
           {isLogin ? "Nouveau ici ? Créer un compte" : "Déjà membre ? Se connecter"}
