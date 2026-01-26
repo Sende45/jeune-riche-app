@@ -28,15 +28,16 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); 
   const [user, setUser] = useState(null); 
-  const [loading, setLoading] = useState(true); // État crucial pour attendre Firebase
+  const [loading, setLoading] = useState(true); 
   
   const initialCategory = { type: 'All', value: 'La Collection' };
   const [activeCategory, setActiveCategory] = useState(initialCategory);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log("Auth State Changed:", currentUser?.email); // Debug Console
       setUser(currentUser);
-      setLoading(false); // On ne libère la vue que quand l'auth est prête
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -54,15 +55,17 @@ function App() {
     }
   }, [isCartOpen, isSidebarOpen]);
 
-  // Vérification stricte
-  const isAdmin = user && user.email?.toLowerCase() === "yohannesende@gmail.com";
+  // Vérification ultra-stricte (trim pour éviter les espaces invisibles)
+  const isAdmin = user && user.email?.trim().toLowerCase() === "yohannesende@gmail.com";
 
   return (
     <WishlistProvider>
       <CartProvider>
         <div className="font-sans antialiased text-slate-900 flex flex-col min-h-screen bg-white max-w-[2560px] mx-auto overflow-x-hidden">
           
-          {/* SYNC CATALOGUE */}
+          {/* Debug Info (Visible uniquement pour toi en cours de test si tu décomptes) */}
+          {/* <div className="fixed top-20 left-0 z-[9999] bg-black text-white text-[8px] p-1">User: {user?.email} | Admin: {isAdmin ? "YES" : "NO"}</div> */}
+
           <button 
             onClick={() => {
               if(window.confirm("Voulez-vous écraser l'ancien catalogue ?")) {
@@ -98,18 +101,18 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/profile" element={<Profile />} />
               
-              {/* PROTECTION AMÉLIORÉE */}
+              {/* PROTECTION ADMIN SÉCURISÉE */}
               <Route 
                 path="/admin-gs" 
                 element={
                   loading ? (
-                    <div className="h-screen flex items-center justify-center bg-white">
+                    <div className="h-[60vh] flex items-center justify-center bg-white">
                       <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   ) : isAdmin ? (
                     <Admin />
                   ) : (
-                    <Navigate to="/login" replace />
+                    <Navigate to="/login" state={{ from: '/admin-gs' }} replace />
                   )
                 } 
               />
