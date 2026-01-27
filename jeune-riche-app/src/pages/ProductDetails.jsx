@@ -3,18 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useCart } from '../context/CartContext';
-import { ChevronLeft, ShieldCheck, Truck, Download, LayoutGrid, MessageCircle } from 'lucide-react';
+import { ChevronLeft, ShieldCheck, Truck, Download, LayoutGrid, MessageCircle, Ruler } from 'lucide-react';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(""); // État pour la taille
   const { addToCart } = useCart();
+
+  // Listes de tailles
+  const clothingSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  const shoeSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
 
   // Fonction pour commander directement via WhatsApp
   const handleWhatsAppOrder = () => {
-    const phoneNumber = "225 07 67 79 31 20"; // 👈 REMPLACE PAR TON NUMÉRO ICI
-    const message = `Salut GOATSTORE ! 👋\nJe suis intéressé par cet article :\n\n*Produit:* ${product.name}\n*Prix:* ${Number(product.price).toLocaleString()} FCFA\n\nEst-ce qu'il est toujours disponible ?`;
+    const phoneNumber = "225 07 67 79 31 20"; 
+    const message = `Salut GOATSTORE ! 👋\nJe suis intéressé par cet article :\n\n*Produit:* ${product.name}\n*Taille:* ${selectedSize || 'Non précisée'}\n*Prix:* ${Number(product.price).toLocaleString()} FCFA\n\nEst-ce qu'il est toujours disponible ?`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
   };
@@ -41,6 +46,9 @@ const ProductDetails = () => {
       <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">GOATSTORE : Chargement du luxe...</p>
     </div>
   );
+
+  // Déterminer quelles tailles afficher
+  const availableSizes = product.category === 'Chaussures' ? shoeSizes : clothingSizes;
 
   return (
     <div className="min-h-screen bg-white">
@@ -88,6 +96,30 @@ const ProductDetails = () => {
               </p>
             </div>
 
+            {/* SÉLECTEUR DE TAILLES */}
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+              <h4 className="font-black uppercase text-xs tracking-widest text-slate-900 mb-6 flex items-center gap-2">
+                <Ruler size={16} className="text-orange-600" /> Choisir votre taille
+              </h4>
+              <div className="flex flex-wrap gap-3">
+                {availableSizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`min-w-[50px] h-[50px] flex items-center justify-center rounded-xl font-bold text-sm transition-all border-2
+                      ${selectedSize === size 
+                        ? 'border-orange-600 bg-orange-600 text-white shadow-lg shadow-orange-100 scale-110' 
+                        : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-300'}`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              {product.category === 'Chaussures' && (
+                <p className="text-[10px] text-slate-400 mt-4 uppercase font-bold tracking-widest">Conseil : Prenez votre pointure habituelle</p>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-start gap-4 p-6 bg-white border border-slate-100 rounded-2xl shadow-sm">
                 <div className="bg-orange-50 p-3 rounded-xl text-orange-600"><Truck size={24} /></div>
@@ -120,10 +152,14 @@ const ProductDetails = () => {
 
               {/* Bouton Panier Classique */}
               <button 
-                onClick={() => addToCart(product)}
-                className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-slate-800 transition-all active:scale-95"
+                onClick={() => addToCart({ ...product, size: selectedSize })}
+                disabled={!selectedSize}
+                className={`w-full py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] transition-all active:scale-95
+                  ${selectedSize 
+                    ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
               >
-                Ajouter au panier
+                {selectedSize ? 'Ajouter au panier' : 'Sélectionnez une taille'}
               </button>
 
               {/* Bouton WhatsApp - Direct Checkout */}

@@ -49,7 +49,6 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
     <div className="min-h-screen w-full overflow-x-hidden bg-white">
       {/* 1. HERO SECTION - Adaptée pour toutes les tailles d'écran */}
       <section className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] flex items-center justify-center bg-[#0f172a] mt-16 overflow-hidden">
-        {/* Effet de lumière en fond pour les grands écrans/TV */}
         <div className="absolute inset-0 bg-gradient-to-b from-orange-600/10 to-transparent"></div>
         
         <div className="relative z-10 text-center px-4 w-full max-w-[2000px] mx-auto">
@@ -77,7 +76,15 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
             {filteredProducts.map(product => (
-               <ProductCard key={product.id} {...product} />
+               <div key={product.id} className="group flex flex-col">
+                  <ProductCard {...product} />
+                  {/* AJOUT : Affichage des tailles disponibles sous la carte */}
+                  <div className="mt-2 px-1">
+                    <span className="text-[9px] font-black text-orange-600 uppercase tracking-widest opacity-60">
+                      Tailles : {product.category === 'Chaussures' ? '36 — 45' : 'XS — 3XL'}
+                    </span>
+                  </div>
+               </div>
             ))}
           </div>
         )}
@@ -86,7 +93,7 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
       {/* 3. MANIFESTE - Centré pour tablettes et TV */}
       <section className="py-16 md:py-24 bg-slate-50 border-y border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <Quote className="mx-auto text-orange-600 mb-6 md:mb-8 opacity-20" size={32} md={48} />
+          <Quote className="mx-auto text-orange-600 mb-6 md:mb-8 opacity-20" size={32} />
           <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 uppercase tracking-tighter mb-6">
             Manifeste GOATSTORE
           </h3>
@@ -99,12 +106,11 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
 
       {/* 4. NEWSLETTER - Adaptée Mobile/Desktop/TV */}
       <section className="py-20 md:py-32 bg-[#0f172a] text-white overflow-hidden relative">
-        {/* Décoration pour grands écrans */}
         <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-orange-600/10 blur-[100px] md:blur-[120px] rounded-full"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-600/5 blur-[80px] rounded-full"></div>
         
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <Mail className="mx-auto text-orange-500 mb-6 md:mb-8" size={32} md={40} />
+          <Mail className="mx-auto text-orange-500 mb-6 md:mb-8" size={32} />
           <h4 className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-4 md:mb-6">
             Rejoignez le Club GOAT
           </h4>
