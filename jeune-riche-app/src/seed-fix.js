@@ -65,8 +65,7 @@ const productsData = [
   { name: "Tecno Spark 40 Pro", price: 150000, category: "Digital", subCategory: "Téléphones", condition: "Neuf Scellé", type: "digital", image: "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?auto=format&fit=crop&w=800&q=80" },
 
   // --- GAMING & ORDINATEURS ---
-  { name: "PlayStation 5 Neuf", price: 400000, category: "Digital", subCategory: "Gaming", type: "digital", image: "https://media.direct.playstation.com/is/image/psdirect/ps5-slim-disc-console-featured-image" },
-  { name: "PlayStation 4 Neuf", price: 270000, category: "Digital", subCategory: "Gaming", type: "digital", image: "https://images.unsplash.com/photo-1507450491953-20e7f53ec16a?auto=format&fit=crop&w=800&q=80" },
+
   { name: "MacBook Pro M3 14\"", price: 1350000, category: "Digital", subCategory: "Ordinateurs", type: "digital", image: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mbp14-spaceblack-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1697304094142" },
 
   // --- ACCESSOIRES ---

@@ -29,14 +29,7 @@ const productsToUpload = [
     image: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=500",
     type: "digital"
   },
-  { 
-    name: "Console PS5 Edition Standard", 
-    price: 450000, 
-    mainCategory: "Digital", 
-    subCategory: "Consoles", 
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=500",
-    type: "digital"
-  }
+  
 ];
 
 export const seedDatabase = async () => {

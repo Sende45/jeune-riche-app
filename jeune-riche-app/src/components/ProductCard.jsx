@@ -10,8 +10,13 @@ const ProductCard = ({ id, name, price, category, image, type, subCategory, stoc
 
   // --- LOGIQUE DE DÉTECTION ULTRA-STRICTE ---
   const cleanCategory = category?.toLowerCase().trim() || "";
+  const cleanSub = subCategory?.toLowerCase().trim() || ""; // Ajout pour plus de précision
+  
   const isClothing = cleanCategory === "vêtements" || cleanCategory === "vetements" || cleanCategory === "vêtement" || cleanCategory.includes("habit");
   const isShoes = cleanCategory === "chaussures" || cleanCategory === "chaussure" || cleanCategory.includes("basket");
+  
+  // MODIF : Ajout de la détection Digital / Consoles
+  const isDigital = cleanCategory === "digital" || type === "digital" || cleanSub === "consoles" || cleanSub === "téléphones" || cleanSub === "accessoires";
   
   // Modif : Un produit a besoin d'une taille si cat vêtement/chaussure OU s'il a des tailles définies en BD
   const needsSize = isClothing || isShoes || (sizes && sizes.length > 0);
@@ -49,7 +54,8 @@ const ProductCard = ({ id, name, price, category, image, type, subCategory, stoc
           <span className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-black tracking-[0.2em] uppercase shadow-sm text-slate-900">
             {subCategory || category}
           </span>
-          {type === 'digital' && (
+          {/* MODIF : Utilise isDigital pour afficher le badge même si le "type" est oublié en BD */}
+          {(type === 'digital' || isDigital) && (
             <span className="bg-orange-600 text-white px-3 py-1 rounded-full text-[9px] font-black flex items-center gap-1 shadow-lg animate-pulse">
               <Download className="w-3 h-3" /> DIGITAL
             </span>
