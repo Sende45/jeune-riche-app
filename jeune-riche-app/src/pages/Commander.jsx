@@ -1,47 +1,40 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { db, auth } from '../firebase'; // On ajoute auth ici
+import { db, auth } from '../firebase'; 
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { CheckCircle, ShoppingBag, ArrowRight } from 'lucide-react';
+import { CheckCircle, ShoppingBag, ArrowRight, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Commander = () => {
   const { cart, cartTotal, clearCart } = useCart();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // Pour la validation automatique sans alert
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
-    // On récupère l'utilisateur actuellement connecté
     const user = auth.currentUser;
 
-    // MODIFICATION : On s'assure que les items incluent la taille choisie pour la BD
     const itemsWithSizes = cart.map(item => ({
       id: item.id,
       name: item.name,
       price: item.price,
       quantity: item.quantity,
-      size: item.size || null, // Capture la taille sélectionnée
+      size: item.size || null,
       image: item.image || ""
     }));
 
     const orderData = {
-      // Informations du formulaire
       customerName: e.target[0].value,
       whatsapp: e.target[1].value,
       address: e.target[2].value,
-      
-      // Informations du panier (avec les tailles incluses)
       items: itemsWithSizes,
       total: cartTotal,
-      
-      // Liaison avec le compte client
-      userId: user ? user.uid : "guest", // Si pas connecté, on marque "guest"
+      userId: user ? user.uid : "guest",
       userEmail: user ? user.email : "non-connecté",
-      
-      // MODIFICATION : Statut synchronisé avec le système de tracking ("pending")
       status: "pending",
       statusLabel: "En attente",
       createdAt: serverTimestamp()
@@ -53,7 +46,9 @@ const Commander = () => {
       clearCart();
     } catch (err) {
       console.error("Erreur Firebase:", err);
-      alert("Problème de connexion. Réessayez.");
+      // Remplacement de alert() par une validation automatique
+      setError("Problème de connexion. Réessayez.");
+      setTimeout(() => setError(null), 4000); 
     } finally {
       setLoading(false);
     }
@@ -82,7 +77,18 @@ const Commander = () => {
   );
 
   return (
-    <div className="pt-32 pb-20 px-6 max-w-xl mx-auto">
+    <div className="pt-32 pb-20 px-6 max-w-xl mx-auto relative">
+      
+      {/* MESSAGE D'ERREUR AUTOMATIQUE */}
+      {error && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="bg-red-600 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3">
+            <AlertCircle size={20} />
+            <p className="text-[10px] font-black uppercase tracking-widest">{error}</p>
+          </div>
+        </div>
+      )}
+
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-black mb-2 uppercase italic tracking-tighter">Finaliser la commande</h1>
         <div className="h-1 w-12 bg-orange-600 mx-auto rounded-full"></div>

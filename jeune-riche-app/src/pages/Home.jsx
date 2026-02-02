@@ -1,20 +1,14 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../firebase'; 
 import { collection, getDocs, query, where } from "firebase/firestore";
 import ProductCard from '../components/ProductCard';
 import { ShoppingBag, Mail, Quote, Send } from 'lucide-react'; 
-
-// IMPORTATION DE LA FONCTION SEED
-import { uploadAllProducts } from '../seed-fix'; 
+ 
 
 const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Collection' } }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    window.uploadGoat = uploadAllProducts;
-    console.log("🚀 GOATSTORE : Tapez uploadGoat() dans la console pour remplir le catalogue.");
-  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -23,7 +17,6 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
       try {
         let q = collection(db, "products");
         
-        // MODIF : Gestion intelligente catégorie vs sous-catégorie
         if (activeCategory.type !== 'All') {
           const filterField = ["Vêtements", "Chaussures", "Digital"].includes(activeCategory.value) 
             ? "category" 
@@ -33,13 +26,10 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
         }
         
         const querySnapshot = await getDocs(q);
-        // --- MODIF : RÉCUPÉRATION BLINDÉE DU STOCK ET DES IMAGES ---
         const productsData = querySnapshot.docs.map(doc => ({ 
           id: doc.id, 
           ...doc.data(),
-          // On force le stock en nombre pour être sûr que l'alerte s'affiche
           stock: doc.data().stock !== undefined ? Number(doc.data().stock) : 0,
-          // On s'assure que l'image est bien présente
           image: doc.data().image || ""
         }));
         setProducts(productsData);
@@ -86,17 +76,14 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
             {filteredProducts.map(product => {
-                // --- DÉTECTION STRICTE (Améliorée avec normalize pour les accents) ---
                 const cat = product.category?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
                 const isShoe = cat.includes("chaussure");
                 const isClothing = cat.includes("vetement") || cat.includes("habit") || cat.includes("ensemble");
 
                 return (
                   <div key={product.id} className="group flex flex-col">
-                     {/* On passe le produit avec le stock forcé en Number */}
                      <ProductCard {...product} />
                      
-                     {/* AFFICHAGE DES TAILLES SEULEMENT SI NÉCESSAIRE */}
                      {(isShoe || isClothing) && (
                        <div className="mt-3 px-2 flex items-center gap-2 animate-in fade-in duration-500">
                          <div className="h-[1px] flex-1 bg-slate-100 group-hover:bg-orange-100 transition-colors"></div>
@@ -107,7 +94,6 @@ const Home = ({ searchQuery = "", activeCategory = { type: 'All', value: 'La Col
                        </div>
                      )}
 
-                     {/* SI C'EST DU DIGITAL : Petit badge discret */}
                      {(!isShoe && !isClothing) && (
                        <div className="mt-3 px-2 flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                          <div className="h-[1px] flex-1 bg-slate-50"></div>

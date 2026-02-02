@@ -17,10 +17,12 @@ export const CartProvider = ({ children }) => {
       }
       return [...prevCart, { ...product, quantity: 1 }];
     });
-    alert(`${product.name} ajouté au panier !`);
+
+    // MODIFICATION : J'ai supprimé la ligne alert(...) 
+    // C'est cette suppression qui empêche le navigateur d'afficher son popup gris.
   };
 
-  // --- MODIFICATIONS AJOUTÉES ---
+  // --- TOUTES TES AUTRES MODIFICATIONS SONT CONSERVÉES ICI ---
 
   // Supprimer un article du panier (pour le bouton poubelle)
   const removeFromCart = (productId) => {
@@ -32,8 +34,6 @@ export const CartProvider = ({ children }) => {
     setCart([]);
   };
 
-  // ------------------------------
-
   // Calcul du montant total
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
@@ -44,8 +44,8 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider value={{ 
       cart, 
       addToCart, 
-      removeFromCart, // Ajouté
-      clearCart,      // Ajouté
+      removeFromCart, 
+      clearCart,      
       cartTotal, 
       cartCount 
     }}>

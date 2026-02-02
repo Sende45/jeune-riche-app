@@ -21,7 +21,6 @@ import Auth from './pages/Auth';
 import ContactPage from './pages/ContactPage'; 
 import Profile from './pages/Profile';
 import Favorites from './pages/Favorites';
- 
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -56,12 +55,11 @@ function App() {
 
   const isAdmin = user && user.email?.trim().toLowerCase() === "yohannesende@gmail.com";
 
-  // --- MODIFICATION : DÉTECTION INTELLIGENTE DE LA CATÉGORIE ---
+  // --- DÉTECTION INTELLIGENTE DE LA CATÉGORIE ---
   const handleCategorySelection = (cat) => {
     if (cat === 'All') {
       setActiveCategory(initialCategory);
     } else {
-      // Si on clique sur un titre principal (Vêtements, Chaussures, Digital)
       const mainCats = ["Vêtements", "Chaussures", "Digital"];
       const type = mainCats.includes(cat) ? 'cat' : 'sub';
       setActiveCategory({ type: type, value: cat });
@@ -73,16 +71,7 @@ function App() {
       <CartProvider>
         <div className="font-sans antialiased text-slate-900 flex flex-col min-h-screen bg-white max-w-[2560px] mx-auto overflow-x-hidden">
           
-          <button 
-            onClick={() => {
-              if(window.confirm("Voulez-vous écraser l'ancien catalogue ?")) {
-                uploadAllProducts();
-              }
-            }}
-            className="fixed bottom-6 right-6 z-[9999] bg-orange-600 text-white px-4 py-2 rounded-full text-[10px] font-black shadow-2xl hover:scale-110 transition-transform hidden md:block"
-          >
-            🔄 SYNC CATALOGUE JR
-          </button>
+          {/* MODIFICATION : Le bouton SYNC CATALOGUE JR qui causait le popup navigateur a été supprimé ici */}
 
           <Header 
             onOpenCart={() => setIsCartOpen(true)} 
@@ -95,7 +84,6 @@ function App() {
           <Sidebar 
             isOpen={isSidebarOpen} 
             onClose={() => setIsSidebarOpen(false)} 
-            // MODIF : Utilisation de la nouvelle fonction de sélection
             onCategorySelect={handleCategorySelection}
             onReset={handleResetHome}
           />
